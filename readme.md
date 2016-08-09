@@ -30,7 +30,7 @@ Secret3=meow
 ### Install
 
 ```sh
-curl -sL https://github.com/mapbox/decrypt-kms-env/archive/v1.0.2.tar.gz | tar --gunzip --extract --strip-components=1 --exclude=readme.md --directory=/usr/local
+curl -sL https://github.com/mapbox/decrypt-kms-env/archive/v1.0.3.tar.gz | tar --gunzip --extract --strip-components=1 --exclude=readme.md --directory=/usr/local
 ```
 
 ### Our usage
