@@ -10,9 +10,9 @@ fi
 for pair in $(env | grep '=secure:'); do
     key=${pair%=*}
     encrypted=${pair#*=secure:}
-    echo $encrypted | base64 -d > /tmp/kms-encrypted-value
-    decrypted=$(aws kms decrypt --ciphertext-blob fileb:///tmp/kms-encrypted-value --query 'Plaintext' --output text | base64 -d)
+    echo $encrypted | base64 -d > ./kms-encrypted-value
+    decrypted=$(aws kms decrypt --ciphertext-blob fileb://./kms-encrypted-value --query 'Plaintext' --output text | base64 -d)
     export $key="$decrypted"
-    rm -f /tmp/kms-encrypted-value
+    rm -f ./kms-encrypted-value
 done
 
