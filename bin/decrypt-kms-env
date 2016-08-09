@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -eu
 
 if ! which aws > /dev/null; then
   echo "Could not find required command 'aws'"
