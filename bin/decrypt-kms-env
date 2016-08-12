@@ -2,9 +2,9 @@
 
 set -eu
 
-if ! which aws > /dev/null; then
-  echo "Could not find required command 'aws'"
-  exit 1
+if ! type -t aws > /dev/null; then
+    echo "Could not find required command 'aws'"
+    exit 1
 fi
 
 for pair in $(env | grep '=secure:'); do
@@ -13,6 +13,7 @@ for pair in $(env | grep '=secure:'); do
     echo $encrypted | base64 -d > ./kms-encrypted-value
     decrypted=$(aws kms decrypt --ciphertext-blob fileb://./kms-encrypted-value --query 'Plaintext' --output text | base64 -d)
     export $key="$decrypted"
+    echo "Decrypted $key=$(echo "${decrypted:0:-4}" | sed 's,.,*,g')${decrypted:(-4)}"
     rm -f ./kms-encrypted-value
 done
 
