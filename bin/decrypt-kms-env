@@ -2,7 +2,7 @@
 
 set -eu
 
-if ! type -t aws > /dev/null; then
+if ! type aws > /dev/null; then
     echo "Could not find required command 'aws'"
     exit 1
 fi
