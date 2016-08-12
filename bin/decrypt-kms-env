@@ -13,7 +13,7 @@ for pair in $(env | grep '=secure:'); do
     echo $encrypted | base64 -d > ./kms-encrypted-value
     decrypted=$(aws kms decrypt --ciphertext-blob fileb://./kms-encrypted-value --query 'Plaintext' --output text | base64 -d)
     export $key="$decrypted"
-    echo "Decrypted $key=$(echo -n "${decrypted}" | cut -b 4- | sed 's,.,*,g')$(echo -n "${decrypted}" | tail -c -4)"
+    echo "Decrypted $key=************$(echo -n "${decrypted}" | tail -c -4)"
     rm -f ./kms-encrypted-value
 done
 
