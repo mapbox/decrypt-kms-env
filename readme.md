@@ -37,3 +37,18 @@ RUN eval $(./node_modules/.bin/decrypt-kms-env) && npm start
 ### Our usage
 
 We use this from within Docker containers to decrypt env vars encrypted via KMS.
+
+------
+
+### v1.x
+
+For projects using `pyhton` & `awscli` rather than node, the `v1.x` branch of this project can be used.
+
+```sh
+# Install
+curl -sL https://github.com/mapbox/decrypt-kms-env/archive/v1.0.6.tar.gz | tar --gunzip --extract --strip-components=1 --exclude=readme.md --directory=/usr/local
+
+# Run app
+. decrypt-kms-env && npm start
+```
+
