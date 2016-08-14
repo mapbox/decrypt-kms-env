@@ -42,7 +42,7 @@ We use this from within Docker containers to decrypt env vars encrypted via KMS.
 
 ### v1.x
 
-For projects using `pyhton` & `awscli` rather than node, the `v1.x` branch of this project can be used.
+For projects using `python` & `awscli` rather than node, the `v1.x` branch of this project can be used.
 
 ```sh
 # Install
