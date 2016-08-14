@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-if (!process.env.AWS_DEFAULT_REGION) throw new Error('AWS_DEFAULT_REGION env var must be set');
-
 var AWS = require('aws-sdk');
 var util = require('util');
 var queue = require('d3-queue').queue;
@@ -9,8 +7,9 @@ var queue = require('d3-queue').queue;
 module.exports = decrypt;
 
 function decrypt(env, callback) {
+  if (!env.AWS_DEFAULT_REGION) return callback(new Error('AWS_DEFAULT_REGION env var must be set'));
   var kms = new AWS.KMS({
-    region: process.env.AWS_DEFAULT_REGION,
+    region: env.AWS_DEFAULT_REGION,
     maxRetries: 10
   });
   var q = queue();
