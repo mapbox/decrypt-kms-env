@@ -40,5 +40,10 @@ if (!module.parent) {
     if (err) throw err;
     console.log(output);
   });
+  process.on('uncaughtException', function(err) {
+    console.warn(err.toString());
+    console.log('exit 1;');
+    process.exit(1);
+  });
 }
 
