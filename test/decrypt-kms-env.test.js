@@ -1,16 +1,16 @@
 var tape = require('tape');
 var AWS = require('aws-sdk-mock');
-var decrypt = require('../bin/decrypt-kms-env');
+var dke = require('../index.js');
 
 tape('decrypt-kms-env: errors without region', function(assert) {
-  decrypt({}, function(err, output) {
+  dke.sh({}, function(err, output) {
     assert.deepEqual(err && err.toString(), 'Error: AWS_DEFAULT_REGION env var must be set', 'errors');
     assert.end();
   });
 });
 
 tape('decrypt-kms-env: no secure env vars', function(assert) {
-  decrypt({
+  dke.sh({
     AWS_DEFAULT_REGION: 'us-east-1'
   }, function(err, output) {
     assert.ifError(err, 'no error');
@@ -28,7 +28,7 @@ tape('decrypt-kms-env: secure env vars', function(assert) {
       return callback(null, { Plaintext: (new Buffer('DecryptedValue2')).toString('base64') });
     assert.fail('Unrecognized encrypted value ' + encrypted);
   });
-  decrypt({
+  dke.sh({
     AWS_DEFAULT_REGION: 'us-east-1',
     SecureVarA: 'secure:' + (new Buffer('EncryptedValue1')).toString('base64'),
     SecureVarB: 'secure:' + (new Buffer('EncryptedValue2')).toString('base64'),
