@@ -14,7 +14,7 @@ function js(env, callback) {
   decrypt(env, function(err, decrypted) {
     if (err) return callback(err);
     var scrubbed = {};
-    results.forEach(function(data) {
+    decrypted.forEach(function(data) {
       env[data.key] = data.decrypted;
       scrubbed[data.key] = scrub(data.decrypted);
     });
