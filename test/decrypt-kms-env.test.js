@@ -35,7 +35,7 @@ tape('decrypt-kms-env: secure env vars', function(assert) {
     NormalVarC: 'Hello World'
   }, function(err, output) {
     assert.ifError(err, 'no error');
-    assert.deepEqual(output, 'export SecureVarA=DecryptedValue1; echo \'Decrypted SecureVarA=************lue1\'; export SecureVarB=DecryptedValue2; echo \'Decrypted SecureVarB=************lue2\'; ', 'shell output');
+    assert.deepEqual(output, 'export SecureVarA=\'DecryptedValue1\'; echo \'Decrypted SecureVarA=************lue1\'; export SecureVarB=\'DecryptedValue2\'; echo \'Decrypted SecureVarB=************lue2\'; ', 'shell output');
     assert.end();
   });
 });
