@@ -31,7 +31,7 @@ function sh(env, callback) {
     if (err) return callback(err);
     var output = '';
     decrypted.forEach(function(data) {
-      output += util.format('export %s=%s; ', data.key, data.decrypted);
+      output += util.format('export %s=\'%s\'; ', data.key, data.decrypted);
       output += util.format('echo \'Decrypted %s=%s\'; ', data.key, scrub(data.decrypted));
     });
     callback(null, output);
