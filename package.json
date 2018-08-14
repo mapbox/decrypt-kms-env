@@ -20,11 +20,11 @@
   },
   "homepage": "https://github.com/mapbox/decrypt-kms-env",
   "dependencies": {
-    "aws-sdk": "^2.5.0",
-    "d3-queue": "^3.0.2"
+    "aws-sdk": "^2.292.0",
+    "d3-queue": "^3.0.7"
   },
   "devDependencies": {
-    "aws-sdk-mock": "^1.4.1",
-    "tape": "^4.6.0"
+    "aws-sdk-mock": "^4.1.0",
+    "tape": "^4.9.1"
   }
 }
