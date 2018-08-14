@@ -1,6 +1,8 @@
-decrypt-kms-env
----------------
-Simple util for decrypting secure environment variables encrypted using KMS.
+# decrypt-kms-env
+
+[![Build Status](https://travis-ci.org/mapbox/decrypt-kms-env.svg?branch=master)](https://travis-ci.org/mapbox/decrypt-kms-env)
+
+Simple utility for decrypting secure environment variables encrypted using KMS.
 
 ### Install
 
