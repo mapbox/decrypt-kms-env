@@ -1,5 +1,5 @@
 {
-  "name": "decrypt-kms-env",
+  "name": "@mapbox/decrypt-kms-env",
   "version": "3.0.0",
   "description": "Simple util for decrypting secure environment variables encrypted using KMS",
   "main": "./index.js",
