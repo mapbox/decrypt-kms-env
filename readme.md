@@ -6,7 +6,7 @@ Simple utility for decrypting secure environment variables encrypted using KMS.
 
 ### Install
 
-Include `decrypt-kms-env` in your project's `package.json`.
+`npm install @mapbox/decrypt-kms-env --save`
 
 ### From a Dockerfile/shell
 
@@ -32,7 +32,7 @@ Decrypted SecureValueB=************913X
 If you don't have access to a shell to set env vars before starting your app, you can run `decrypt-kms-env` via JS.
 
 ```js
-var dke = require('decrypt-kms-env');
+var dke = require('@mapbox/decrypt-kms-env');
 dke(process.env, function(err, scrubbed) {
   if (err) throw err;
   // Values in process.env are now decrypted.
