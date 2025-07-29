@@ -51,16 +51,33 @@ function decrypt(env, callback) {
     maxRetries: 10
   });
   var q = queue();
+  var MAX_CIPHERTEXT_SIZE = 4096;
+  var BASE64_REGEX = /^[A-Za-z0-9+/]*={0,2}$/;
+  
   for (var key in env) {
     if (!(/^secure:/).test(env[key])) continue;
+    var ciphertextB64 = env[key].replace(/^secure:/,'');
+    
+    if (ciphertextB64.length > MAX_CIPHERTEXT_SIZE) {
+      return callback(new Error('Ciphertext for key "' + key + '" exceeds maximum allowed size of ' + MAX_CIPHERTEXT_SIZE + ' bytes'));
+    }
+    
+    if (!BASE64_REGEX.test(ciphertextB64)) {
+      return callback(new Error('Invalid base64 format for key "' + key + '"'));
+    }
+    
     q.defer(function(key, val, done) {
-      kms.decrypt({
-        CiphertextBlob: new Buffer(val, 'base64')
-      }, function(err, data) {
-        if (err) return done(err);
-        done(null, { key: key, val: val, decrypted: (new Buffer(data.Plaintext, 'base64')).toString('utf8') });
-      });
-    }, key, env[key].replace(/^secure:/,''));
+      try {
+        kms.decrypt({
+          CiphertextBlob: Buffer.from(val, 'base64')
+        }, function(err, data) {
+          if (err) return done(err);
+          done(null, { key: key, val: val, decrypted: Buffer.from(data.Plaintext, 'base64').toString('utf8') });
+        });
+      } catch (e) {
+        done(new Error('Failed to decode base64 for key "' + key + '": ' + e.message));
+      }
+    }, key, ciphertextB64);
   }
   q.awaitAll(function(err, results) {
     if (err) return callback(err);
