@@ -1,4 +1,4 @@
-var AWS = require('aws-sdk');
+var { KMSClient, DecryptCommand } = require('@aws-sdk/client-kms');
 var util = require('util');
 var queue = require('d3-queue').queue;
 
@@ -46,33 +46,35 @@ function sh(env, callback) {
  */
 function decrypt(env, callback) {
   if (!env.AWS_DEFAULT_REGION) return callback(new Error('AWS_DEFAULT_REGION env var must be set'));
-  var kms = new AWS.KMS({
+  var kms = new KMSClient({
     region: env.AWS_DEFAULT_REGION,
-    maxRetries: 10
+    maxAttempts: 10
   });
   var q = queue();
   var MAX_CIPHERTEXT_SIZE = 4096;
   var BASE64_REGEX = /^[A-Za-z0-9+/]*={0,2}$/;
-  
+
   for (var key in env) {
     if (!(/^secure:/).test(env[key])) continue;
     var ciphertextB64 = env[key].replace(/^secure:/,'');
-    
+
     if (ciphertextB64.length > MAX_CIPHERTEXT_SIZE) {
       return callback(new Error('Ciphertext for key "' + key + '" exceeds maximum allowed size of ' + MAX_CIPHERTEXT_SIZE + ' bytes'));
     }
-    
+
     if (!BASE64_REGEX.test(ciphertextB64)) {
       return callback(new Error('Invalid base64 format for key "' + key + '"'));
     }
-    
+
     q.defer(function(key, val, done) {
       try {
-        kms.decrypt({
+        var command = new DecryptCommand({
           CiphertextBlob: Buffer.from(val, 'base64')
-        }, function(err, data) {
-          if (err) return done(err);
+        });
+        kms.send(command).then(function(data) {
           done(null, { key: key, val: val, decrypted: Buffer.from(data.Plaintext, 'base64').toString('utf8') });
+        }).catch(function(err) {
+          done(err);
         });
       } catch (e) {
         done(new Error('Failed to decode base64 for key "' + key + '": ' + e.message));
@@ -91,4 +93,3 @@ function decrypt(env, callback) {
 function scrub(value) {
   return util.format('************%s', value.substr(-4));
 }
-

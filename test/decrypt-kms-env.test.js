@@ -1,8 +1,12 @@
 var tape = require('tape');
-var AWS = require('aws-sdk-mock');
+var { mockClient } = require('aws-sdk-client-mock');
+var { KMSClient, DecryptCommand } = require('@aws-sdk/client-kms');
 var dke = require('../index.js');
 
+var kmsMock = mockClient(KMSClient);
+
 tape('decrypt-kms-env: errors without region', function(assert) {
+  kmsMock.reset();
   dke.sh({}, function(err, output) {
     assert.deepEqual(err && err.toString(), 'Error: AWS_DEFAULT_REGION env var must be set', 'errors');
     assert.end();
@@ -10,6 +14,7 @@ tape('decrypt-kms-env: errors without region', function(assert) {
 });
 
 tape('decrypt-kms-env: no secure env vars', function(assert) {
+  kmsMock.reset();
   dke.sh({
     AWS_DEFAULT_REGION: 'us-east-1'
   }, function(err, output) {
@@ -20,13 +25,14 @@ tape('decrypt-kms-env: no secure env vars', function(assert) {
 });
 
 tape('decrypt-kms-env: secure env vars', function(assert) {
-  AWS.mock('KMS', 'decrypt', function(params, callback) {
+  kmsMock.reset();
+  kmsMock.on(DecryptCommand).callsFake(function(params) {
     var encrypted = Buffer.from(params.CiphertextBlob, 'base64').toString('utf8');
     if (encrypted === 'EncryptedValue1')
-      return callback(null, { Plaintext: Buffer.from('DecryptedValue1').toString('base64') });
+      return Promise.resolve({ Plaintext: Buffer.from('DecryptedValue1').toString('base64') });
     if (encrypted === 'EncryptedValue2')
-      return callback(null, { Plaintext: Buffer.from('DecryptedValue2').toString('base64') });
-    assert.fail('Unrecognized encrypted value ' + encrypted);
+      return Promise.resolve({ Plaintext: Buffer.from('DecryptedValue2').toString('base64') });
+    return Promise.reject(new Error('Unrecognized encrypted value ' + encrypted));
   });
   dke.sh({
     AWS_DEFAULT_REGION: 'us-east-1',
@@ -42,6 +48,7 @@ tape('decrypt-kms-env: secure env vars', function(assert) {
 
 
 tape('js dke: errors without region', function(assert) {
+  kmsMock.reset();
   dke({}, function(err, output) {
     assert.deepEqual(err && err.toString(), 'Error: AWS_DEFAULT_REGION env var must be set', 'errors');
     assert.end();
@@ -49,6 +56,7 @@ tape('js dke: errors without region', function(assert) {
 });
 
 tape('js dke: no secure env vars', function(assert) {
+  kmsMock.reset();
   dke({
     AWS_DEFAULT_REGION: 'us-east-1'
   }, function(err, output) {
@@ -59,13 +67,14 @@ tape('js dke: no secure env vars', function(assert) {
 });
 
 tape('js dke', function(assert) {
-  AWS.mock('KMS', 'decrypt', function(params, callback) {
+  kmsMock.reset();
+  kmsMock.on(DecryptCommand).callsFake(function(params) {
     var encrypted = Buffer.from(params.CiphertextBlob, 'base64').toString('utf8');
     if (encrypted === 'EncryptedValue1')
-      return callback(null, { Plaintext: Buffer.from('DecryptedValue1').toString('base64') });
+      return Promise.resolve({ Plaintext: Buffer.from('DecryptedValue1').toString('base64') });
     if (encrypted === 'EncryptedValue2')
-      return callback(null, { Plaintext: Buffer.from('DecryptedValue2').toString('base64') });
-    assert.fail('Unrecognized encrypted value ' + encrypted);
+      return Promise.resolve({ Plaintext: Buffer.from('DecryptedValue2').toString('base64') });
+    return Promise.reject(new Error('Unrecognized encrypted value ' + encrypted));
   });
   var env = {
     AWS_DEFAULT_REGION: 'us-east-1',
@@ -90,6 +99,7 @@ tape('js dke', function(assert) {
 });
 
 tape('decrypt-kms-env: rejects oversized ciphertext', function(assert) {
+  kmsMock.reset();
   var largePayload = Buffer.alloc(5000).toString('base64'); // Over 4KB limit
   dke.sh({
     AWS_DEFAULT_REGION: 'us-east-1',
@@ -102,6 +112,7 @@ tape('decrypt-kms-env: rejects oversized ciphertext', function(assert) {
 });
 
 tape('decrypt-kms-env: rejects invalid base64', function(assert) {
+  kmsMock.reset();
   dke.sh({
     AWS_DEFAULT_REGION: 'us-east-1',
     SecureVar: 'secure:invalid!@#$%^&*()base64'
@@ -113,6 +124,7 @@ tape('decrypt-kms-env: rejects invalid base64', function(assert) {
 });
 
 tape('js dke: rejects oversized ciphertext', function(assert) {
+  kmsMock.reset();
   var largePayload = Buffer.alloc(5000).toString('base64'); // Over 4KB limit
   var env = {
     AWS_DEFAULT_REGION: 'us-east-1',
@@ -126,6 +138,7 @@ tape('js dke: rejects oversized ciphertext', function(assert) {
 });
 
 tape('js dke: rejects invalid base64', function(assert) {
+  kmsMock.reset();
   var env = {
     AWS_DEFAULT_REGION: 'us-east-1',
     SecureVar: 'secure:invalid!@#$%^&*()base64'
@@ -136,4 +149,3 @@ tape('js dke: rejects invalid base64', function(assert) {
     assert.end();
   });
 });
-
