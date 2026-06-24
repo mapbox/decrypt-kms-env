@@ -1,6 +1,6 @@
 {
   "name": "@mapbox/decrypt-kms-env",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Simple util for decrypting secure environment variables encrypted using KMS",
   "main": "./index.js",
   "bin": {
@@ -26,5 +26,8 @@
   "devDependencies": {
     "aws-sdk-client-mock": "^4.0.0",
     "tape": "^4.9.1"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
