@@ -25,6 +25,6 @@
   },
   "devDependencies": {
     "aws-sdk-client-mock": "^4.0.0",
-    "tape": "^4.9.1"
+    "tape": "^5.0.0"
   }
 }
